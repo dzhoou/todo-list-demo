@@ -24,7 +24,7 @@ var server = http.createServer(function(request, response){
             response.end(listString);
             break;
         case 'POST':
-            //Update list element in server
+            //Create list element in server
             var item = '';
             request.on('data', function (chunk) {
                 item += chunk;
@@ -56,7 +56,7 @@ var server = http.createServer(function(request, response){
             request.on('data', function (chunk) {
                 item += chunk;
                 if (item.length > 1e6)
-                //Too much POST data, end connection
+                //Too much PUT data, end connection
                     request.connection.destroy();
             });
             request.on('end', function(){
