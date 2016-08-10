@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>My TODO list</title>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        textarea {
+            border:1px solid deepskyblue;
+            border-radius: 4px;
+            outline:none;
+            width:300px;
+            min-height:15px;
+            padding:5px;
+        }
+        .list {
+            text-align:center;
+        }
+        .listelement {
+            text-align:left;
+            margin: 6px;
+            width: 450px;
+            border:1px solid darkorange;
+            border-radius: 4px;
+            padding:5px;
+        }
+    </style>
+</head>
+<body>
+<p style="font-size:30px; text-align: center">My JQuery TODO list</p><br/>
+<textarea id="newTodo"> </textarea><br/>
+<button onclick="server('POST', newTodo.value, '')">Add TODO</button>
+
+<p id="actionstatus"></p>
+<p id="list"></p>
+
+</body>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script>
+    var list = document.getElementById('list');
+    var actionstatus = document.getElementById('actionstatus');
+    var newTodo = document.getElementById('newTodo');
+
+    //Server function that connects to Node.js backend for CRUD operations
+    function server (type, data, index){
+        if(type!='GET'){
+            //Display a message when server is being updated
+            actionstatus.innerHTML="Please Wait..."
+        }
+        $.ajax({
+            url: "http://localhost:8000/" +index,
+            type: type,
+            data: data,
+            success: function(result){
+                if(type=='GET') {
+                    //Server returned with list data, display it
+                    var body='';
+                    for (var i in result){
+                        body+="<p class=\"listelement\">TODO #"+(parseInt(i)+1)+"<br/><textarea id=\"todo"+i+"\" rows=\"1\" cols=\"30\">"+result[i]+"</textarea><button onclick=\"server('PUT', document.getElementById('todo"+i+"').value, '"+i+"')\">Update</button><button onclick=\"server('DELETE', '', '"+i+"')\">Delete</button></p>";
+                    }
+                    list.innerHTML = body;
+                }
+                else{
+                    //Server was updated, display the refreshed list
+                    server('GET', '', '');
+                    actionstatus.innerHTML = type + " Operation Succeded."
+                }
+            }
+        })
+    }
+    //Display list when webpage is opened
+    server('GET', '', '');
+</script>
+</html>
